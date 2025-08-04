@@ -15,7 +15,9 @@
 
 # next.js
 /.next/
+.next-static
 /out/
+dist/
 
 # production
 /build
@@ -23,6 +25,7 @@
 # misc
 .DS_Store
 *.pem
+.vscode/
 
 # debug
 npm-debug.log*
@@ -39,3 +42,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.supabase/**/config.toml
+.supabase/**/.temp/**
+
+# OS
+Thumbs.db
