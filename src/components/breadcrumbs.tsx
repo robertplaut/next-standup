@@ -12,14 +12,21 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 
+/* prettier-ignore */
 function labelFor(seg: string) {
   switch (seg) {
-    case "standups":
-      return "Stand-up Notes";
-    case "profile":
-      return "Profile";
+    case "standups":       return "Stand-up Notes";
+    case "users":          return "User List";
+    case "github-prs":     return "GitHub PRs";
+    case "summaries":      return "Summaries";
+    case "ai-summaries":   return "AI Summaries";
+    case "profile":        return "Profile";
     default:
-      return decodeURIComponent(seg);
+      /* Title-case kebab segments as a graceful fallback, e.g. "foo-bar" → "Foo Bar" */
+      return seg
+        .split("-")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
   }
 }
 
@@ -27,7 +34,7 @@ export default function Breadcrumbs() {
   const pathname = usePathname() || "/";
   const segments = pathname.split("/").filter(Boolean);
 
-  // Build items: Home + each segment cumulatively
+  // Build breadcrumb items: Home + each cumulative segment
   const items = [{ href: "/", label: "Home" }].concat(
     segments.map((seg, idx) => ({
       href: "/" + segments.slice(0, idx + 1).join("/"),

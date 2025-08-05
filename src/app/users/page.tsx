@@ -68,7 +68,7 @@ export default async function UsersPage() {
 
                   return (
                     <Link key={m.id} href={href} className="block">
-                      <Card className="h-full hover:bg-muted/40 transition">
+                      <Card className="h-full hover:bg-muted/40 hover:shadow-lg transition-shadow duration-200">
                         <CardContent className="p-4 flex items-center gap-4">
                           <div className="shrink-0 rounded overflow-hidden w-12 h-12 bg-muted">
                             {username ? (
