@@ -37,20 +37,25 @@ export default function AggregatedSummaryView(props: {
   const [rows, setRows] = useState<AggregatedNote[]>([]);
   const selected = props.selectedUserIds;
 
+  /*  ➜  Client’s local timezone offset (minutes)  */
+  const offsetMinutes = -new Date().getTimezoneOffset(); // EST = -300, PDT = -420, etc.
+
   useEffect(() => {
     let cancel = false;
     setLoading(true);
-    fetchAggregatedNotes(props.period, selected)
+
+    fetchAggregatedNotes(props.period, selected, offsetMinutes)
       .then((res) => {
         if (cancel) return;
         if (res.ok) setRows(res.rows ?? []);
         else setRows([]);
       })
       .finally(() => !cancel && setLoading(false));
+
     return () => {
       cancel = true;
     };
-  }, [props.period, selected.join(",")]);
+  }, [props.period, selected.join(","), offsetMinutes]);
 
   const grouped = useMemo(() => {
     const byDate: Record<string, AggregatedNote[]> = {};

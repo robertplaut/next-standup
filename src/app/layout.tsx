@@ -30,7 +30,7 @@ export default async function RootLayout({
         <ThemeProvider>
           <div className="min-h-dvh grid grid-cols-[16rem_1fr]">
             {/* Sidebar */}
-            <aside className="border-r bg-background">
+            <aside className="border-r bg-muted/60 dark:bg-muted/40">
               {/* Pass signedIn so 'User List' appears only when logged in */}
               <AppSidebar signedIn={Boolean(user)} />
             </aside>

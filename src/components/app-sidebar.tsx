@@ -2,7 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Separator } from "@/components/ui/separator";
+import {
+  Home,
+  StickyNote,
+  Users,
+  Github,
+  ListChecks,
+  Sparkles,
+  User as UserIcon,
+  Cpu,
+} from "lucide-react";
 
 type Props = { signedIn: boolean };
 
@@ -15,33 +24,36 @@ export default function AppSidebar({ signedIn }: Props) {
   const pathname = usePathname() || "/";
 
   const NAV = [
-    { label: "Home", href: "/" },
-    { label: "Stand-up Notes", href: "/standups" },
-
+    { label: "Home", href: "/", icon: Home },
+    { label: "Stand-up Notes", href: "/standups", icon: StickyNote },
     ...(signedIn
       ? [
-          { label: "User List", href: "/users" },
-          { label: "GitHub PRs", href: "/github-prs" },
-          { label: "Summaries", href: "/summaries" },
-          { label: "AI Summaries", href: "/ai-summaries" },
-          { label: "Profile", href: "/profile" },
+          { label: "User List", href: "/users", icon: Users },
+          { label: "GitHub PRs", href: "/github-prs", icon: Github },
+          { label: "Summaries", href: "/summaries", icon: ListChecks },
+          { label: "AI Summaries", href: "/ai-summaries", icon: Sparkles },
+          { label: "Profile", href: "/profile", icon: UserIcon },
         ]
       : []),
   ];
 
   return (
     <div className="h-full flex flex-col">
-      {/* Brand */}
-      <div className="p-4">
-        <div className="text-xs uppercase text-muted-foreground">App</div>
-        <div className="text-xl font-semibold">next-standup</div>
+      {/* Brand row */}
+      <div className="p-4 flex items-center gap-2">
+        {/* colorful engineering icon */}
+        <Cpu
+          size={20}
+          strokeWidth={2}
+          className="text-indigo-600 dark:text-indigo-400"
+        />
+        <span className="text-xl font-semibold">Next Standup</span>
       </div>
-      <Separator />
 
       {/* Nav */}
       <nav className="p-2">
         <ul className="space-y-1">
-          {NAV.map(({ label, href }) => {
+          {NAV.map(({ label, href, icon: Icon }) => {
             const active = isActive(pathname, href);
             return (
               <li key={href}>
@@ -49,10 +61,11 @@ export default function AppSidebar({ signedIn }: Props) {
                   href={href}
                   aria-current={active ? "page" : undefined}
                   className={[
-                    "block rounded px-3 py-2 text-sm hover:bg-muted",
-                    active ? "bg-muted font-medium" : "text-foreground/80",
+                    "flex items-center gap-3 rounded px-3 py-2 text-sm hover:bg-muted/50",
+                    active ? "bg-muted/60 font-medium" : "text-foreground/80",
                   ].join(" ")}
                 >
+                  <Icon size={18} strokeWidth={1.8} className="shrink-0" />
                   {label}
                 </Link>
               </li>

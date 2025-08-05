@@ -27,9 +27,11 @@ export async function saveSummarySelections(userIds: string[]) {
   return { ok: true };
 }
 
-/** Compute [startDate, endDate] for 'today'|'week'|'month' in yyyy-mm-dd (UTC date strings) */
-function periodRange(period: Period): { from: string; to: string } {
-  const now = new Date();
+/** Compute [startDate, endDate] (yyyy-mm-dd) in the caller’s local day. */
+function periodRange(period: Period, offsetMinutes = 0) {
+  // Shift `now` by the caller’s timezone offset
+  const now = new Date(Date.now() + offsetMinutes * 60_000);
+
   const y = now.getUTCFullYear();
   const m = now.getUTCMonth();
   const d = now.getUTCDate();
@@ -38,15 +40,13 @@ function periodRange(period: Period): { from: string; to: string } {
   let from = new Date(to);
 
   if (period === "today") {
-    // from = today
+    /* no change */
   } else if (period === "week") {
-    // ISO-like week (Mon..Sun) in UTC
     const day = to.getUTCDay(); // 0=Sun..6=Sat
-    const diff = (day + 6) % 7; // days since Monday
+    const diff = (day + 6) % 7; // since Monday
     from = new Date(Date.UTC(y, m, d - diff));
   } else {
-    // month
-    from = new Date(Date.UTC(y, m, 1));
+    from = new Date(Date.UTC(y, m, 1)); // month start
   }
 
   const fmt = (x: Date) => x.toISOString().slice(0, 10);
@@ -70,7 +70,11 @@ export type AggregatedNote = {
  * Fetch aggregated notes for a set of user IDs and period.
  * If userIds is empty, returns [].
  */
-export async function fetchAggregatedNotes(period: Period, userIds: string[]) {
+export async function fetchAggregatedNotes(
+  period: Period,
+  userIds: string[],
+  offsetMinutes = 0
+) {
   const supabase = await createSupabaseServerActionClient();
   const {
     data: { user },
@@ -80,7 +84,7 @@ export async function fetchAggregatedNotes(period: Period, userIds: string[]) {
   if (!userIds || userIds.length === 0)
     return { ok: true, rows: [] as AggregatedNote[] };
 
-  const { from, to } = periodRange(period);
+  const { from, to } = periodRange(period, offsetMinutes);
 
   // 1) Get standups for selected users in range
   const { data: notes, error: nerr } = await supabase
