@@ -11,6 +11,7 @@ import {
   Sparkles,
   User as UserIcon,
   Cpu,
+  BookOpen, // NEW
 } from "lucide-react";
 
 type Props = { signedIn: boolean };
@@ -35,13 +36,14 @@ export default function AppSidebar({ signedIn }: Props) {
           { label: "Profile", href: "/profile", icon: UserIcon },
         ]
       : []),
+    /* Public link (always visible) ------------------------------------ */
+    { label: "Education", href: "/education", icon: BookOpen },
   ];
 
   return (
     <div className="h-full flex flex-col">
       {/* Brand row */}
       <div className="p-4 flex items-center gap-2">
-        {/* colorful engineering icon */}
         <Cpu
           size={20}
           strokeWidth={2}
