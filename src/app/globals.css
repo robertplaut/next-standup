@@ -114,6 +114,55 @@
   --widget-header: oklch(0.22 0 0);
 }
 
+/* ────────────────────────────────────────────────────────────
+   BLUE  💧 palette – NEW
+   “blue” theme is a gentle light-blue UI variant.
+   ──────────────────────────────────────────────────────────── */
+.blue {
+  --background: oklch(0.98 0.02 225); /* #f0f8ff */
+  --foreground: oklch(0.18 0.01 240); /* dark slate */
+  --card: oklch(1 0 0);
+  --card-foreground: var(--foreground);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--foreground);
+
+  --primary: oklch(0.46 0.13 235); /* vibrant blue buttons */
+  --primary-foreground: oklch(0.985 0 0); /* white text */
+
+  --secondary: oklch(0.95 0.02 225); /* pale blue tint */
+  --secondary-foreground: var(--foreground);
+
+  --muted: oklch(0.95 0.02 225);
+  --muted-foreground: oklch(0.46 0.07 235);
+
+  --accent: oklch(0.92 0.03 215);
+  --accent-foreground: var(--foreground);
+
+  --destructive: oklch(0.62 0.18 27.3); /* keep existing red */
+
+  --border: oklch(0.9 0.01 225);
+  --input: oklch(0.9 0.01 225);
+  --ring: oklch(0.55 0.08 235);
+
+  /* Charts & sidebar */
+  --chart-1: oklch(0.66 0.18 235);
+  --chart-2: oklch(0.57 0.12 205);
+  --chart-3: oklch(0.46 0.13 235);
+  --chart-4: oklch(0.78 0.17 215);
+  --chart-5: oklch(0.72 0.16 195);
+
+  --sidebar: oklch(0.96 0.02 225);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+
+  --widget-header: oklch(0.93 0.02 225);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

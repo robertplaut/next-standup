@@ -9,14 +9,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Sun, Moon, Laptop } from "lucide-react";
+import { Sun, Moon, Laptop, Droplet } from "lucide-react";
 
 /**
- * Theme toggle with icons.
- *
- * • Topbar button shows the icon for the current theme (light ☀️, dark 🌙, or system 💻).
- * • Dropdown items include matching icons.
- * • During SSR hydration we render a placeholder icon (Sun) to avoid mismatches.
+ * Theme toggle with icons (light ☀️, dark 🌙, blue 💧, system 💻).
+ * Uses a placeholder icon during SSR hydration.
  */
 export default function ModeToggle() {
   const { theme, setTheme } = useTheme();
@@ -25,10 +22,12 @@ export default function ModeToggle() {
 
   // Decide which icon to show in the button
   const CurrentIcon = () => {
-    if (!mounted) return <Sun className="h-4 w-4" />; // placeholder while hydrating
+    if (!mounted) return <Sun className="h-4 w-4" />;
     switch (theme) {
       case "dark":
         return <Moon className="h-4 w-4" />;
+      case "blue":
+        return <Droplet className="h-4 w-4" />;
       case "system":
         return <Laptop className="h-4 w-4" />;
       default:
@@ -39,7 +38,6 @@ export default function ModeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        {/* icon-only button; keeps size consistent with other icon buttons */}
         <Button variant="outline" size="icon" aria-label="Toggle theme">
           <CurrentIcon />
         </Button>
@@ -52,6 +50,10 @@ export default function ModeToggle() {
         <DropdownMenuItem onClick={() => setTheme("dark")}>
           <Moon className="mr-2 h-4 w-4" />
           Dark
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("blue")}>
+          <Droplet className="mr-2 h-4 w-4" />
+          Blue
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
           <Laptop className="mr-2 h-4 w-4" />
