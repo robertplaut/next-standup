@@ -7,22 +7,22 @@ const openai = new OpenAI();
 export async function POST(req: Request) {
   const supabase = await createSupabaseServerActionClient();
 
-  /* Auth ------------------------------------------------------- */
+  /* ──────────────── Auth ──────────────── */
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  /* Body ------------------------------------------------------- */
+  /* ──────────────── Body ──────────────── */
   const { date } = (await req.json().catch(() => ({}))) as { date?: string };
   if (!date)
     return NextResponse.json({ error: "date required" }, { status: 400 });
 
-  const localDay = date; // already yyyy-mm-dd in caller’s TZ
+  const localDay = date; // yyyy-mm-dd
   console.log("AI-route » localDay =", localDay);
 
-  /* Caller’s selections --------------------------------------- */
+  /* ───────────── Caller’s selections ───────────── */
   const { data: profile } = await supabase
     .from("profiles")
     .select("summary_selected_user_ids, display_name")
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
   if (selected.length === 0) return NextResponse.json({ notFound: true });
   console.log("AI-route » selectedUserIds =", selected);
 
-  /* 1) Fetch standups rows ------------------------------------ */
+  /* ──────────────── 1) Fetch notes ──────────────── */
   const { data: notes, error: nerr } = await supabase
     .from("standups")
     .select(
@@ -48,11 +48,10 @@ export async function POST(req: Request) {
 
   if (nerr) console.error("AI-route » standups error:", nerr);
   console.log("AI-route » notes rows =", notes?.length || 0);
-
   if (!notes || notes.length === 0)
     return NextResponse.json({ notFound: true });
 
-  /* 2) Fetch profile info ------------------------------------- */
+  /* ──────────────── 2) Fetch profiles ──────────────── */
   const ids = Array.from(new Set(notes.map((n) => n.user_id)));
   const { data: profs, error: perr } = await supabase
     .from("profiles")
@@ -68,7 +67,7 @@ export async function POST(req: Request) {
     ])
   );
 
-  /* Collect users list for prompt */
+  /* Users list for prompt */
   const users = Array.from(
     new Set(
       ids.map(
@@ -78,7 +77,7 @@ export async function POST(req: Request) {
     )
   );
 
-  /* Build plain-text blob ------------------------------------- */
+  /* ──────────────── Plain-text blob ──────────────── */
   const formatted = notes
     .map((n) => {
       const p = byId.get(n.user_id) ?? {};
@@ -92,21 +91,21 @@ export async function POST(req: Request) {
     })
     .join("\n");
 
-  /* Display date ---------------------------------------------- */
+  /* ──────────────── Display date ──────────────── */
   const displayDate = new Date(localDay + "T00:00:00").toLocaleDateString(
     "en-US",
     { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }
   );
 
-  /* Prompt ----------------------------------------------------- */
+  /* ──────────────── Prompt ──────────────── */
   const systemPrompt = `
 You are an expert assistant for a software development team. Your task is to create a concise, professional summary of the team's daily stand-up notes for ${displayDate}.
 
 The following users contributed today: ${users.join(", ")}.
 
-Your output MUST be a single block of clean, elegant HTML. Do NOT include any markdown-style backticks. The entire response must be valid HTML.
+**Important**: The “Personalized Email Update” section must briefly mention noteworthy updates from *all* contributors, not only ${requestingUserDisplayName}. Address the email to ${requestingUserDisplayName}, but describe everyone’s progress, plans, and blockers in a friendly tone.
 
-Construct the HTML exactly like this:
+Return a single clean HTML block (no markdown fences):
 
 <div class="ai-summary-container">
   <h2>Daily Summary for ${displayDate}</h2>
@@ -114,23 +113,20 @@ Construct the HTML exactly like this:
 
   <h3>Key Takeaways:</h3>
   <ul>
-    <!-- AI: Generate a bulleted list of key accomplishments, plans, and blockers from the notes. -->
+    <!-- AI: bullet list summarising team-wide highlights -->
   </ul>
 
   <hr style="margin: 2rem 0; border: 0; border-top: 1px solid var(--color-border);" />
 
   <h3>Personalized Email Update:</h3>
   <p>Dear ${requestingUserDisplayName},</p>
-  <p>Here's a quick update on today's stand-up notes:</p>
-  <p>
-    <!-- AI: Write a conversational, personal email here. -->
-  </p>
+  <p><!-- AI: conversational email covering each team member’s update --></p>
   <p>Love,</p>
   <p>Echostatus</p>
 </div>
-  `.trim();
+`.trim();
 
-  /* OpenAI ------------------------------------------------------ */
+  /* ──────────────── OpenAI ──────────────── */
   const completion = await openai.chat.completions.create({
     model: "gpt-4o",
     temperature: 0.6,
